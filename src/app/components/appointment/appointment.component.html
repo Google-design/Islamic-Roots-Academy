@@ -1,72 +1,97 @@
-<!-- <div class="container">
-    <h1>Islamic Roots Academy</h1>
-    <div 
-      class="service-card" 
-      *ngFor="let service of services" 
-      (click)="onServiceClick(service)"
-    >
-      <h3>{{ service.name }}</h3>
-      <p>{{ service.description }}</p>
-      <div class="service-info">
-        <span>${{ service.price }}</span>
-        <span> · {{ service.duration }} min</span>
-      </div>
-    </div>
-  </div> -->
+<h1>Islamic Roots Academy</h1>
 
-  <h1>Islamic Roots Academy</h1>
+<mat-stepper [linear]="true" [orientation]="(stepperOrientation | async) || 'horizontal'" #stepper>
+  <!-- Step 1: Select a Service -->
+  <mat-step>
+    <ng-template matStepLabel>Select a service</ng-template>
 
-  <mat-stepper [linear]="true" #stepper>
-    <!-- Step 1: Select a Service -->
-    <mat-step>
-      <ng-template matStepLabel>Select a service</ng-template>
-      <div class="container">
+    <form [formGroup]="serviceSelectionForm">
+      <mat-radio-group formControlName="selectedService" class="service-radio-group" (change)="onServiceClick(serviceSelectionForm.value.selectedService)">
         <div 
           class="service-card" 
           *ngFor="let service of services" 
-          (click)="onServiceClick(service)"
+          [class.selected]="serviceSelectionForm.value.selectedService === service"
         >
-          <h3>{{ service.name }}</h3>
-          <p>{{ service.description }}</p>
-          <div class="service-info">
-            <span>${{ service.price }}</span>
-            <span> · {{ service.duration }} min</span>
-          </div>
+          <mat-radio-button [value]="service" class="service-radio">
+            <h3>{{ service.name }}</h3>
+            <p>{{ service.description }}</p>
+            <div class="service-info">
+              <span>${{ service.price }}</span>
+              <span> · {{ service.duration }} min</span>
+            </div>
+          </mat-radio-button>
         </div>
-      </div>
-      <div>
-        <button mat-button matStepperNext>Next</button>
-      </div>
-    </mat-step>
+      </mat-radio-group>
 
-    <!-- Step 2: Select a Staff -->
-    <mat-step>
-      <ng-template matStepLabel>Select a staff</ng-template>
-      <p>Staff selection feature coming soon...</p>
-      <div>
-        <button mat-button matStepperPrevious>Back</button>
-        <button mat-button matStepperNext>Next</button>
+      <!-- Error Message -->
+      <div 
+        *ngIf="serviceSelectionForm.controls['selectedService'].invalid 
+        && serviceSelectionForm.controls['selectedService'].touched" 
+        class="error">
+        <p>Please select a service to continue.</p>
       </div>
-    </mat-step>
+
+      <!-- Next Button -->
+      <div class="button-container">
+        <button mat-button matStepperNext [disabled]="serviceSelectionForm.invalid">Next</button>
+      </div>
+    </form>
+  </mat-step>
+
+  <!-- Step 2: Select a Staff -->
+  <mat-step [completed]="!!selectedServiceStaff.length">
+    <ng-template matStepLabel>Select a Staff Member</ng-template>
+  
+    <div class="staff-container">
+      <div 
+        class="staff-card" 
+        *ngFor="let staff of selectedServiceStaff" 
+        [class.selected]="selectedStaff === staff"
+        (click)="onStaffSelect(staff)"
+      >
+        <div class="staff-avatar">
+          <span>{{ getStaffInitials(staff) }}</span> <!-- Pass 'staff' directly -->
+        </div>
+        <div class="staff-info">
+          <h3>{{ staff }}</h3> <!-- Display the staff member's name -->
+          <p>{{ 'Staff' }}</p> <!-- Display a static role, or adjust as needed -->
+        </div>
+        <mat-radio-button 
+          [value]="staff" 
+          [checked]="selectedStaff === staff"
+          class="staff-radio"
+        >
+        </mat-radio-button>
+      </div>
+    </div>
+  
+    <!-- Next Button -->
+    <div class="button-container">
+      <button mat-button matStepperPrevious [disabled]="!selectedStaff">Back</button>
+      <!-- Next Button -->
+      <button mat-button matStepperNext [disabled]="!selectedStaff">Next</button>
+    </div>
+
+  </mat-step>
 
   <!-- Step 3: Select Date and Time -->
-    <mat-step>
-      <ng-template matStepLabel>Select Date and Time</ng-template>
-      <mat-form-field>
-        <mat-label>Date</mat-label>
-        <input matInput [matDatepicker]="picker" placeholder="Choose a date">
-        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-        <mat-datepicker #picker></mat-datepicker>
-      </mat-form-field>
-      <mat-form-field>
-        <mat-label>Time</mat-label>
-        <input matInput type="time" placeholder="Choose a time">
-      </mat-form-field>
-      <div>
-        <button mat-button matStepperPrevious>Back</button>
-        <button mat-button matStepperNext>Next</button>
-      </div>
-    </mat-step>
+  <mat-step>
+    <ng-template matStepLabel>Select Date and Time</ng-template>
+    <mat-form-field>
+      <mat-label>Date</mat-label>
+      <input matInput [matDatepicker]="picker" placeholder="Choose a date">
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Time</mat-label>
+      <input matInput type="time" placeholder="Choose a time">
+    </mat-form-field>
+    <div>
+      <button mat-button matStepperPrevious>Back</button>
+      <button mat-button matStepperNext>Next</button>
+    </div>
+  </mat-step>
 
   <!-- Step 4: Payment -->
   <mat-step>

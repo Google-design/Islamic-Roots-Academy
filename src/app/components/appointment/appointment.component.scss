@@ -59,3 +59,114 @@ h1 {
 .mat-mdc-form-field {
   margin-top: 16px;
 }
+
+.service-radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.service-card {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 16px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.service-card.selected {
+  border-color: #3f51b5;
+  box-shadow: 0 2px 8px rgba(63, 81, 181, 0.3);
+}
+
+.service-radio {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.error {
+  color: red;
+  margin-top: 8px;
+}
+
+.staff-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.staff-card {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.staff-card.selected {
+  background-color: #e6f0ff; /* Light blue for selected */
+  border-color: #004a99;
+}
+
+.staff-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #d8e3f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 15px;
+  font-weight: bold;
+  color: #004a99;
+}
+
+.staff-info h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.staff-info p {
+  margin: 0;
+  font-size: 12px;
+  color: #666;
+}
+
+.staff-radio {
+  margin-left: auto;
+}
+
+.button-container {
+  display: flex;
+  justify-content: flex-end; /* Align button to the right */
+  margin-top: 20px;  /* Optional: Add spacing above the button */
+}
+
+button {
+  padding: 10px 20px;  /* Add padding to the button */
+  font-size: 16px;  /* Adjust font size */
+}
+
+mat-button {
+  background-color: #007bff;  /* Add background color */
+  color: white;  /* Text color */
+  border-radius: 5px;  /* Rounded corners */
+  transition: background-color 0.3s ease;  /* Smooth transition for hover effect */
+}
+
+mat-button:hover {
+  background-color: #0056b3;  /* Darker background on hover */
+}
+
+mat-button[disabled] {
+  background-color: #e0e0e0;  /* Disabled button color */
+  color: #b0b0b0;  /* Disabled text color */
+}
+
+form, .stepper-container {
+  width: 100%; /* Ensure the form takes full width */
+}
