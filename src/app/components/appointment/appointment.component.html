@@ -1,4 +1,4 @@
-<div class="container">
+<!-- <div class="container">
     <h1>Islamic Roots Academy</h1>
     <div 
       class="service-card" 
@@ -12,5 +12,79 @@
         <span> · {{ service.duration }} min</span>
       </div>
     </div>
-  </div>
-  
+  </div> -->
+
+  <h1>Islamic Roots Academy</h1>
+
+  <mat-stepper [linear]="true" #stepper>
+    <!-- Step 1: Select a Service -->
+    <mat-step>
+      <ng-template matStepLabel>Select a service</ng-template>
+      <div class="container">
+        <div 
+          class="service-card" 
+          *ngFor="let service of services" 
+          (click)="onServiceClick(service)"
+        >
+          <h3>{{ service.name }}</h3>
+          <p>{{ service.description }}</p>
+          <div class="service-info">
+            <span>${{ service.price }}</span>
+            <span> · {{ service.duration }} min</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <button mat-button matStepperNext>Next</button>
+      </div>
+    </mat-step>
+
+    <!-- Step 2: Select a Staff -->
+    <mat-step>
+      <ng-template matStepLabel>Select a staff</ng-template>
+      <p>Staff selection feature coming soon...</p>
+      <div>
+        <button mat-button matStepperPrevious>Back</button>
+        <button mat-button matStepperNext>Next</button>
+      </div>
+    </mat-step>
+
+  <!-- Step 3: Select Date and Time -->
+    <mat-step>
+      <ng-template matStepLabel>Select Date and Time</ng-template>
+      <mat-form-field>
+        <mat-label>Date</mat-label>
+        <input matInput [matDatepicker]="picker" placeholder="Choose a date">
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Time</mat-label>
+        <input matInput type="time" placeholder="Choose a time">
+      </mat-form-field>
+      <div>
+        <button mat-button matStepperPrevious>Back</button>
+        <button mat-button matStepperNext>Next</button>
+      </div>
+    </mat-step>
+
+  <!-- Step 4: Payment -->
+  <mat-step>
+    <ng-template matStepLabel>Payment</ng-template>
+    <p>Payment integration coming soon...</p>
+    <div>
+      <button mat-button matStepperPrevious>Back</button>
+      <button mat-button matStepperNext>Next</button>
+    </div>
+  </mat-step>
+
+  <!-- Step 5: Done -->
+  <mat-step>
+    <ng-template matStepLabel>Done</ng-template>
+    <p>Your appointment is successfully scheduled.</p>
+    <div>
+      <button mat-button matStepperPrevious>Back</button>
+      <button mat-button (click)="stepper.reset()">Reset</button>
+    </div>
+  </mat-step>
+</mat-stepper>
