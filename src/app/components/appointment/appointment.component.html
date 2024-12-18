@@ -1,0 +1,16 @@
+<div class="container">
+    <h1>Islamic Roots Academy</h1>
+    <div 
+      class="service-card" 
+      *ngFor="let service of services" 
+      (click)="onServiceClick(service)"
+    >
+      <h3>{{ service.name }}</h3>
+      <p>{{ service.description }}</p>
+      <div class="service-info">
+        <span>${{ service.price }}</span>
+        <span> · {{ service.duration }} min</span>
+      </div>
+    </div>
+  </div>
+  
