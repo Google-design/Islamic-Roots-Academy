@@ -2,7 +2,7 @@
 
 <mat-stepper [linear]="true" [orientation]="(stepperOrientation | async) || 'horizontal'" #stepper>
   <!-- Step 1: Select a Service -->
-  <mat-step>
+  <mat-step label="Step 1">
     <ng-template matStepLabel>Select a service</ng-template>
 
     <form [formGroup]="serviceSelectionForm">
@@ -39,7 +39,7 @@
   </mat-step>
 
   <!-- Step 2: Select a Staff -->
-  <mat-step [completed]="!!selectedServiceStaff.length">
+  <mat-step [completed]="!!selectedServiceStaff.length" label="Step 2">
     <ng-template matStepLabel>Select a Staff Member</ng-template>
   
     <div class="staff-container">
@@ -75,7 +75,7 @@
   </mat-step>
 
   <!-- Step 3: Select Date and Time -->
-  <mat-step>
+  <mat-step label="Step 3">
     <ng-template matStepLabel>Select Date and Time</ng-template>
     <mat-form-field>
       <mat-label>Date</mat-label>
@@ -89,14 +89,21 @@
     </mat-form-field>
     <div>
       <button mat-button matStepperPrevious>Back</button>
-      <button mat-button matStepperNext>Next</button>
+      <button mat-button (click)="redirectToStripeCheckout()">Next</button>
     </div>
   </mat-step>
 
   <!-- Step 4: Payment -->
-  <mat-step>
+  <mat-step label="Step 4">
     <ng-template matStepLabel>Payment</ng-template>
     <p>Payment integration coming soon...</p>
+
+    <stripe-buy-button
+      buy-button-id="buy_btn_1QXoS9JdgLdisV6J6uPK06Qm"
+      publishable-key="pk_test_51QXV2HJdgLdisV6JlmygXHpsuPQHovT4VsF5YgSrEIEuF5qWTG3aqC7BU6yeKpympI3WRjRsZXpNwVuoCOI2VEUZ00QzkS8kUI"
+    >
+    </stripe-buy-button>
+
     <div>
       <button mat-button matStepperPrevious>Back</button>
       <button mat-button matStepperNext>Next</button>
@@ -104,7 +111,7 @@
   </mat-step>
 
   <!-- Step 5: Done -->
-  <mat-step>
+  <mat-step label="Step 5">
     <ng-template matStepLabel>Done</ng-template>
     <p>Your appointment is successfully scheduled.</p>
     <div>
