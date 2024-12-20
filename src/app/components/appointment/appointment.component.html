@@ -1,6 +1,6 @@
 <h1>Islamic Roots Academy</h1>
 
-<mat-stepper [linear]="true" [orientation]="(stepperOrientation | async) || 'horizontal'" #stepper>
+<mat-stepper [linear]="isLinear" [orientation]="(stepperOrientation | async) || 'horizontal'" #stepper>
   <!-- Step 1: Select a Service -->
   <mat-step label="Step 1">
     <ng-template matStepLabel>Select a service</ng-template>
@@ -67,9 +67,9 @@
   
     <!-- Next Button -->
     <div class="button-container">
-      <button mat-button matStepperPrevious [disabled]="!selectedStaff">Back</button>
+      <button mat-button matStepperPrevious >Back</button>
       <!-- Next Button -->
-      <button mat-button matStepperNext [disabled]="!selectedStaff">Next</button>
+      <button mat-button matStepperNext [disabled]="!selectedStaff" (click)="triggerDateChange()">Next</button>
     </div>
 
   </mat-step>
@@ -77,16 +77,26 @@
   <!-- Step 3: Select Date and Time -->
   <mat-step label="Step 3">
     <ng-template matStepLabel>Select Date and Time</ng-template>
-    <mat-form-field>
-      <mat-label>Date</mat-label>
-      <input matInput [matDatepicker]="picker" placeholder="Choose a date">
-      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-      <mat-datepicker #picker></mat-datepicker>
-    </mat-form-field>
-    <mat-form-field>
-      <mat-label>Time</mat-label>
-      <input matInput type="time" placeholder="Choose a time">
-    </mat-form-field>
+    <div class="calendar-container">
+      <mat-calendar 
+        ngSkipHydration
+        [(selected)]="selectedDate" 
+        [dateFilter]="dateFilter"
+        (selectedChange)="onDateChange($event)">
+      </mat-calendar>
+    </div>
+    
+    <div class="time-container" *ngIf="availableTimes!.length > 0">
+      <h3>Available Times</h3>
+      <div class="time-slot" *ngFor="let time of availableTimes">
+        <button mat-raised-button color="primary" (click)="selectTime(time)">{{ time }}</button>
+      </div>
+    </div>
+    
+    <div *ngIf="availableTimes?.length === 0">
+      <p>No times available for the selected date.</p>
+    </div>
+    
     <div>
       <button mat-button matStepperPrevious>Back</button>
       <button mat-button (click)="redirectToStripeCheckout()">Next</button>

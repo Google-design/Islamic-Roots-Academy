@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, CUSTOM_ELEMENTS_SCHEMA, ViewChild } from '@angular/core';
+import { Component, inject, OnInit, CUSTOM_ELEMENTS_SCHEMA, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { collection, doc, Firestore, getDoc, getDocs } from '@angular/fire/firestore';
 
@@ -16,6 +16,8 @@ import { BreakpointObserver } from '@angular/cdk/layout';
 import { NgxStripeModule } from 'ngx-stripe';
 import { ActivatedRoute, Router } from '@angular/router';
 
+import { addDays, isBefore, isSameDay, startOfDay } from 'date-fns';
+
 @Component({
   selector: 'app-appointment',
   standalone: true,
@@ -31,20 +33,26 @@ import { ActivatedRoute, Router } from '@angular/router';
     MatNativeDateModule,
     MatRadioModule,
     NgxStripeModule,
+    
   ],
   templateUrl: './appointment.component.html',
   styleUrl: './appointment.component.scss',
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 
-export class AppointmentComponent implements OnInit{
+export class AppointmentComponent implements OnInit, AfterViewInit{
   @ViewChild('stepper') stepper!: MatStepper;
+  isLinear: boolean = true;  // Default value for linear navigation
   services: any[] = [];
   stepperOrientation: Observable<'horizontal' | 'vertical'>;
   serviceSelectionForm: FormGroup;
   selectedServiceStaff: any[] = [];
   selectedStaff: any = null;
   selectedServiceUrl: string = '';
+
+  selectedDate: Date | null = new Date();
+  availableTimes: string[] = [];
+  today = startOfDay(new Date());
   
   constructor(
     private firestore: Firestore,
@@ -66,13 +74,42 @@ export class AppointmentComponent implements OnInit{
       .pipe(map(({ matches }) => (matches ? 'horizontal' : 'vertical')));
   }
 
+  ngAfterViewInit(): void {
+    // Now the stepper is available, subscribe to selectionChange
+    this.stepper.selectionChange.subscribe((event) => {
+      const selectedIndex = event.selectedIndex;
+
+      // Ensure the user cannot skip steps if not valid
+      if (selectedIndex > this.stepper.selectedIndex && !this.isStepValid(this.stepper.selectedIndex)) {
+        // Prevent navigating forward if the current step is invalid
+        this.stepper.selectedIndex = this.stepper.selectedIndex;
+      }
+    });
+  }
+
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
       const step = params['step'];
       if (step && !isNaN(step)) {
-        this.stepper.selectedIndex = +step - 1; // Set to step 5 (index 4)
+        const index = Math.min(Math.max(+step - 1, 0), 4);
+        this.isLinear = false;  // Disable linear navigation if a specific step is requested 
+        setTimeout(() => {
+          this.stepper.selectedIndex = index; // Use a delay to make sure the stepper is initialized
+        });
       }
     });
+  }
+
+
+  // Function to check if the current step is valid
+  isStepValid(stepIndex: number): boolean {
+    if (stepIndex === 0) {
+      return this.serviceSelectionForm.valid; // Example for Step 1 validation
+    }
+    if (stepIndex === 1) {
+      return this.selectedStaff !== null; // Example for Step 2 validation
+    }
+    return true; // For other steps, return true
   }
 
   // Step 1
@@ -126,7 +163,59 @@ export class AppointmentComponent implements OnInit{
       .toUpperCase();
   }
 
+  triggerDateChange() {
+    if (!this.selectedDate) {
+      console.warn('No date selected!');
+      return;
+    }
+    this.onDateChange(this.selectedDate);
+  }
+
   // Step 3
+  dateFilter = (date: Date | null): boolean => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const twoMonthsLater = new Date();
+    twoMonthsLater.setMonth(today.getMonth() + 2);
+    twoMonthsLater.setHours(0, 0, 0, 0);
+  
+    return !!date && date >= today && date <= twoMonthsLater; // Allow only dates within range
+  };
+
+  async getTeamMemberAvailability(teamMemberName: string){
+    const docRef = doc(this.firestore, `team_members/${teamMemberName}`);
+    const docSnap = await getDoc(docRef);
+    return docSnap.exists() ? docSnap.data() : null;
+  }
+  
+  async onDateChange(date: Date | null) {
+    if (!date) {
+      this.availableTimes = [];
+      return;
+    } // Handle null case
+
+    const selectedDay = date.toLocaleDateString('en-US', { weekday: 'long' }); // e.g., "Monday"
+    console.log("Selected Day = " + selectedDay);
+    console.log('Available Times Before Fetch:', this.availableTimes);
+
+    this.selectedDate = date;
+    console.log("Selected Date = " + this.selectedDate);
+    const teamMemberName = this.selectedStaff;    // teamMember = staff
+    try {
+      const teamMemberData = await this.getTeamMemberAvailability(teamMemberName);
+      this.availableTimes = teamMemberData?.['availability']?.[selectedDay] || [];
+    } catch(error) {
+      console.error('Error fetching availability:', error);
+      this.availableTimes = [];
+    }
+    console.log('Available Times After Fetch:', this.availableTimes);
+  }
+
+  selectTime(time: string) {
+    console.log('Selected time:', time);
+  }
+
+  // Step 4
   redirectToStripeCheckout(): void {
     if (this.selectedServiceUrl) {
       window.location.href = this.selectedServiceUrl; // Redirect to the appropriate Stripe Checkout URL
