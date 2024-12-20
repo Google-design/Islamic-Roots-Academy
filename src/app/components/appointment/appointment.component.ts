@@ -201,9 +201,12 @@ export class AppointmentComponent implements OnInit, AfterViewInit{
     this.selectedDate = date;
     console.log("Selected Date = " + this.selectedDate);
     const teamMemberName = this.selectedStaff;    // teamMember = staff
+
     try {
       const teamMemberData = await this.getTeamMemberAvailability(teamMemberName);
-      this.availableTimes = teamMemberData?.['availability']?.[selectedDay] || [];
+          
+      // Filter out empty strings or invalid times
+      this.availableTimes = (teamMemberData?.['availability']?.[selectedDay] || []).filter((time: string) => time.trim() !== "");
     } catch(error) {
       console.error('Error fetching availability:', error);
       this.availableTimes = [];
