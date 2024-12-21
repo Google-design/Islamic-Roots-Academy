@@ -39,7 +39,7 @@
   </mat-step>
 
   <!-- Step 2: Select a Staff -->
-  <mat-step [completed]="!!selectedServiceStaff.length" label="Step 2">
+  <mat-step label="Step 2">
     <ng-template matStepLabel>Select a Staff Member</ng-template>
   
     <div class="staff-container">
@@ -106,13 +106,20 @@
   <!-- Step 4: Payment -->
   <mat-step label="Step 4">
     <ng-template matStepLabel>Payment</ng-template>
-    <p>Payment integration coming soon...</p>
+    <!-- <p>Payment integration coming soon...</p> -->
 
     <stripe-buy-button
+      *ngIf="selectedService == 'Quran Classes'"
       buy-button-id="buy_btn_1QXoS9JdgLdisV6J6uPK06Qm"
       publishable-key="pk_test_51QXV2HJdgLdisV6JlmygXHpsuPQHovT4VsF5YgSrEIEuF5qWTG3aqC7BU6yeKpympI3WRjRsZXpNwVuoCOI2VEUZ00QzkS8kUI"
     >
     </stripe-buy-button>
+
+    <stripe-buy-button
+      *ngIf="selectedService == 'Aqeedah Classes'"
+      buy-button-id="buy_btn_1QYYvlJdgLdisV6Jls5sot9n"
+      publishable-key="pk_test_51QXV2HJdgLdisV6JlmygXHpsuPQHovT4VsF5YgSrEIEuF5qWTG3aqC7BU6yeKpympI3WRjRsZXpNwVuoCOI2VEUZ00QzkS8kUI"
+    ></stripe-buy-button>
 
     <div>
       <button mat-button matStepperPrevious>Back</button>

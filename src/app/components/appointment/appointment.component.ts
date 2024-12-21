@@ -49,7 +49,7 @@ export class AppointmentComponent implements OnInit, AfterViewInit{
   selectedServiceStaff: any[] = [];
   selectedStaff: any = null;
   selectedServiceUrl: string = '';
-
+  selectedService: string = '';
   selectedDate: Date | null = new Date();
   availableTimes: string[] = [];
   today = startOfDay(new Date());
@@ -90,11 +90,28 @@ export class AppointmentComponent implements OnInit, AfterViewInit{
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
       const step = params['step'];
+      const selectedServiceName = params['service']; // Retrieve the service from query params
+
+      if (selectedServiceName) {
+        // Find the service object based on the name and set it in the form
+        // const selectedService = this.services.find(service => service.name === selectedServiceName);
+        // if (selectedService) {
+        //   console.log("IN ngOnInit + " + selectedService)
+        //   this.serviceSelectionForm.patchValue({ selectedService });
+        // }
+        this.selectedService = selectedServiceName;
+      }
+
       if (step && !isNaN(step)) {
         const index = Math.min(Math.max(+step - 1, 0), 4);
         this.isLinear = false;  // Disable linear navigation if a specific step is requested 
         setTimeout(() => {
-          this.stepper.selectedIndex = index; // Use a delay to make sure the stepper is initialized
+          this.stepper.selectedIndex = 0;
+          this.stepper.selectedIndex = 1;
+          this.stepper.selectedIndex = 2;
+          this.stepper.selectedIndex = 3;
+          this.stepper.selectedIndex = 4; // Use a delay to make sure the stepper is initialized
+          this.isLinear = true;
         });
       }
     });
@@ -221,6 +238,7 @@ export class AppointmentComponent implements OnInit, AfterViewInit{
   // Step 4
   redirectToStripeCheckout(): void {
     if (this.selectedServiceUrl) {
+      console.log("Selected Service URL = "+ this.selectedServiceUrl);
       window.location.href = this.selectedServiceUrl; // Redirect to the appropriate Stripe Checkout URL
     } else {
       console.error('No service selected or service URL not set.');
