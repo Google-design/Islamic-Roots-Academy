@@ -88,8 +88,15 @@
     
     <div class="time-container" *ngIf="availableTimes!.length > 0">
       <h3>Available Times</h3>
-      <div class="time-slot" *ngFor="let time of availableTimes">
-        <button mat-raised-button color="primary" (click)="selectTime(time)">{{ time }}</button>
+      <div class="time-slot" *ngFor="let timeSlot of availableTimes">
+        <button
+        mat-raised-button
+        color="primary"
+        (click)="!timeSlot.disabled && selectTime(timeSlot.time)"
+        [disabled]="timeSlot.disabled"
+        >
+          {{ timeSlot.time }}
+        </button>
       </div>
     </div>
     

@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, CUSTOM_ELEMENTS_SCHEMA, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { collection, doc, Firestore, getDoc, getDocs } from '@angular/fire/firestore';
+import { collection, doc, Firestore, getDoc, getDocs, query, where } from '@angular/fire/firestore';
 
 import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
@@ -51,7 +51,7 @@ export class AppointmentComponent implements OnInit, AfterViewInit{
   selectedServiceUrl: string = '';
   selectedService: string = '';
   selectedDate: Date | null = new Date();
-  availableTimes: string[] = [];
+  availableTimes: { time: string; disabled: boolean }[] = [];
   today = startOfDay(new Date());
   
   constructor(
@@ -93,12 +93,6 @@ export class AppointmentComponent implements OnInit, AfterViewInit{
       const selectedServiceName = params['service']; // Retrieve the service from query params
 
       if (selectedServiceName) {
-        // Find the service object based on the name and set it in the form
-        // const selectedService = this.services.find(service => service.name === selectedServiceName);
-        // if (selectedService) {
-        //   console.log("IN ngOnInit + " + selectedService)
-        //   this.serviceSelectionForm.patchValue({ selectedService });
-        // }
         this.selectedService = selectedServiceName;
       }
 
@@ -106,10 +100,6 @@ export class AppointmentComponent implements OnInit, AfterViewInit{
         const index = Math.min(Math.max(+step - 1, 0), 4);
         this.isLinear = false;  // Disable linear navigation if a specific step is requested 
         setTimeout(() => {
-          this.stepper.selectedIndex = 0;
-          this.stepper.selectedIndex = 1;
-          this.stepper.selectedIndex = 2;
-          this.stepper.selectedIndex = 3;
           this.stepper.selectedIndex = 4; // Use a delay to make sure the stepper is initialized
           this.isLinear = true;
         });
@@ -212,19 +202,50 @@ export class AppointmentComponent implements OnInit, AfterViewInit{
     } // Handle null case
 
     const selectedDay = date.toLocaleDateString('en-US', { weekday: 'long' }); // e.g., "Monday"
-    console.log("Selected Day = " + selectedDay);
-    console.log('Available Times Before Fetch:', this.availableTimes);
+    // console.log("Selected Day = " + selectedDay);
+    // console.log('Available Times Before Fetch:', this.availableTimes);
 
     this.selectedDate = date;
-    console.log("Selected Date = " + this.selectedDate);
     const teamMemberName = this.selectedStaff;    // teamMember = staff
+    // console.log("Selected Date = " + this.selectedDate);
 
     try {
+      // Querying bookings for selected staff and date
+      const selectedDateString = date.toISOString().split('T')[0];
+      const bookingsCollection = collection(this.firestore, 'bookings');
+      const bookingsQuery = query(
+        bookingsCollection,
+        where('staffBooked', '==', teamMemberName),
+        where('timeBooked', '>=', new Date(selectedDateString)),
+        where('timeBooked', '<', new Date(selectedDateString + 'T23:59:59'))
+      );
+      const snapshot = await getDocs(bookingsQuery);
+      const bookedTimes = snapshot.docs.map(doc => {
+        const bookingData = doc.data();
+        return new Date(bookingData['timeBooked'].seconds * 1000).toLocaleTimeString('en-US', {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true,
+        });
+      });
+
+      // const selectedDateString = date.toLocaleDateString('en-CA');
+      // console.log("DATE: " + selectedDateString);
+      // console.log("Booked TImes = " + bookedTimes);
+
+      // Getting available times for the selected staff
       const teamMemberData = await this.getTeamMemberAvailability(teamMemberName);
-          
       // Filter out empty strings or invalid times
-      this.availableTimes = (teamMemberData?.['availability']?.[selectedDay] || []).filter((time: string) => time.trim() !== "");
-    } catch(error) {
+      const availableTimesForDay = (teamMemberData?.['availability']?.[selectedDay] || [])
+        .filter((time: string) => time.trim() !== "");
+
+      // Flagging booked times
+      this.availableTimes = availableTimesForDay.map((actualTime: string) => ({
+        time: actualTime,
+        disabled: bookedTimes.includes(actualTime), // Mark times as disabled if already booked
+      }));
+
+      } catch(error) {
       console.error('Error fetching availability:', error);
       this.availableTimes = [];
     }
