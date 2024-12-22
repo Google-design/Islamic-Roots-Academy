@@ -90,7 +90,7 @@
       <h3>Available Times</h3>
       <div class="time-slot" *ngFor="let timeSlot of availableTimes">
         <button
-        mat-raised-button
+        mat-stroked-button
         color="primary"
         (click)="!timeSlot.disabled && selectTime(timeSlot.time)"
         [disabled]="timeSlot.disabled"

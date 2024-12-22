@@ -14,9 +14,10 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { map, Observable } from 'rxjs';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { NgxStripeModule } from 'ngx-stripe';
+import { loadStripe } from '@stripe/stripe-js';
 import { ActivatedRoute, Router } from '@angular/router';
 
-import { addDays, isBefore, isSameDay, startOfDay } from 'date-fns';
+import { startOfDay } from 'date-fns';
 
 @Component({
   selector: 'app-appointment',
@@ -91,9 +92,14 @@ export class AppointmentComponent implements OnInit, AfterViewInit{
     this.route.queryParams.subscribe(params => {
       const step = params['step'];
       const selectedServiceName = params['service']; // Retrieve the service from query params
+      const sessionId = params['checkout_session_id'];
 
       if (selectedServiceName) {
         this.selectedService = selectedServiceName;
+      }
+      if (sessionId) {
+        // Assuming that the user was redirected to success_url with the session_id
+        this.createDocument(sessionId);
       }
 
       if (step && !isNaN(step)) {
@@ -180,6 +186,7 @@ export class AppointmentComponent implements OnInit, AfterViewInit{
 
   // Step 3
   dateFilter = (date: Date | null): boolean => {
+    if (!date) return false;
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const twoMonthsLater = new Date();
@@ -202,13 +209,8 @@ export class AppointmentComponent implements OnInit, AfterViewInit{
     } // Handle null case
 
     const selectedDay = date.toLocaleDateString('en-US', { weekday: 'long' }); // e.g., "Monday"
-    // console.log("Selected Day = " + selectedDay);
-    // console.log('Available Times Before Fetch:', this.availableTimes);
-
     this.selectedDate = date;
     const teamMemberName = this.selectedStaff;    // teamMember = staff
-    // console.log("Selected Date = " + this.selectedDate);
-
     try {
       // Querying bookings for selected staff and date
       const selectedDateString = date.toISOString().split('T')[0];
@@ -228,10 +230,6 @@ export class AppointmentComponent implements OnInit, AfterViewInit{
           hour12: true,
         });
       });
-
-      // const selectedDateString = date.toLocaleDateString('en-CA');
-      // console.log("DATE: " + selectedDateString);
-      // console.log("Booked TImes = " + bookedTimes);
 
       // Getting available times for the selected staff
       const teamMemberData = await this.getTeamMemberAvailability(teamMemberName);
@@ -264,5 +262,22 @@ export class AppointmentComponent implements OnInit, AfterViewInit{
     } else {
       console.error('No service selected or service URL not set.');
     }
+  }
+
+  // Step 5
+  
+
+  createDocument(sessionId: string) {
+    // Document data for confirmation
+    const documentData = {
+      serviceBooked: 'Quran Classes',
+      staffBooked: 'Mohammed Aqib',
+      timeBooked: new Date('December 23, 2024 10:00:00 GMT-0600').toISOString(),
+      userName: 'Checking user',
+      sessionId: sessionId,  // Include session_id in document for reference
+    };
+  
+    // Store or process the document data
+    console.log('Document created:', documentData);
   }
 }
