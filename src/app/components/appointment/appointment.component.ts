@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, CUSTOM_ELEMENTS_SCHEMA, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { collection, doc, Firestore, getDoc, getDocs, query, where } from '@angular/fire/firestore';
+import { addDoc, collection, doc, Firestore, getDoc, getDocs, query, where } from '@angular/fire/firestore';
 
 import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
@@ -51,9 +51,10 @@ export class AppointmentComponent implements OnInit, AfterViewInit{
   selectedStaff: any = null;
   selectedServiceUrl: string = '';
   selectedService: string = '';
-  selectedDate: Date | null = new Date();
+  selectedDate: Date = new Date();
   availableTimes: { time: string; disabled: boolean }[] = [];
   today = startOfDay(new Date());
+  selectedTime: any;
   
   constructor(
     private firestore: Firestore,
@@ -251,33 +252,95 @@ export class AppointmentComponent implements OnInit, AfterViewInit{
   }
 
   selectTime(time: string) {
+    this.selectedTime = time;
     console.log('Selected time:', time);
   }
 
   // Step 4
   redirectToStripeCheckout(): void {
-    if (this.selectedServiceUrl) {
-      console.log("Selected Service URL = "+ this.selectedServiceUrl);
-      window.location.href = this.selectedServiceUrl; // Redirect to the appropriate Stripe Checkout URL
+    console.log("All fields: " + JSON.stringify(this.serviceSelectionForm.value.selectedService) + " " + this.selectedStaff + " " + this.selectedDate.toISOString().split('T')[0] + " " + this.selectedTime);
+
+    if (this.serviceSelectionForm.value.selectedService.name && this.selectedStaff && this.selectedDate && this.selectedTime) {
+      const amount = this.serviceSelectionForm.value.selectedService.price
+      
+      const description = this.serviceSelectionForm.value.selectedService.description
+
+      const productImageUrl = this.serviceSelectionForm.value.selectedService.productImageUrl;
+      if (amount === 0) {
+        console.error("Invalid service selected.");
+        return;
+      }
+
+      const payload = {
+        serviceBooked: this.serviceSelectionForm.value.selectedService.name,
+        amount: amount,
+        productImageUrl: productImageUrl,
+        description: description,
+        staffBooked: this.selectedStaff,
+        dateBooked: this.selectedDate.toISOString().split('T')[0],
+        timeBooked: this.selectedTime,
+      };
+
+      // API Hit
+      fetch("https://q1z2uksjy7.execute-api.us-east-2.amazonaws.com/stripePaymentLinks", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      })
+        .then((response) => {
+          if(!response.ok){
+            throw new Error("Failed to fetch Stripe Checkout URL.");
+          }
+          return response.json();
+        })
+        .then((data) => {
+          if (data.payment_link){
+            console.log("Redirecting to Stripe Checkout URL: " + data.payment_link);
+            window.location.href = data.payment_link; // Redirecting to the Stripe Checkout URL
+          } else {
+            console.error("Stripe Checkout URL not received.");
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        })
     } else {
-      console.error('No service selected or service URL not set.');
-    }
+      console.error("Service, staff, or date/time not selected.");
+    }  
   }
 
   // Step 5
-  
+  // Hit the api to check the payment status and then create the docuemnt
+  async createDocument(sessionId: string) {
+    try {
+        const bookingData = {
+          serviceBooked: this.selectedService,
+          staffBooked: this.selectedStaff,
+          timeBooked: this.selectedDate.toISOString(),
+          userName: 'Checking user',  // Ideally, use the logged-in user's data
+          sessionId: sessionId, // Save the sessionId to reference the payment
+        };
 
-  createDocument(sessionId: string) {
-    // Document data for confirmation
-    const documentData = {
-      serviceBooked: 'Quran Classes',
-      staffBooked: 'Mohammed Aqib',
-      timeBooked: new Date('December 23, 2024 10:00:00 GMT-0600').toISOString(),
-      userName: 'Checking user',
-      sessionId: sessionId,  // Include session_id in document for reference
-    };
-  
-    // Store or process the document data
-    console.log('Document created:', documentData);
+        // Save the booking data in Firestore after successful payment
+        const bookingId = await this.saveBookingData(bookingData);
+        console.log('Booking confirmed and saved:', bookingId);
+    } catch (error) {
+      console.error('Error confirming booking after payment:', error);
+    }
+  }
+
+  // Function to save the booking data to Firestore
+  async saveBookingData(bookingData: any): Promise<string> {
+    try {
+      const bookingsCollection = collection(this.firestore, 'bookings');
+      const docRef = await addDoc(bookingsCollection, bookingData);
+      console.log('Booking data saved:', docRef.id);
+      return docRef.id;  // Return the document ID for tracking
+    } catch (error) {
+      console.error('Error saving booking data:', error);
+      throw error;
+    }
   }
 }
