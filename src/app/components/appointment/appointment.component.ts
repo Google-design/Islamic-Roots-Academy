@@ -2,13 +2,14 @@ import { Component, inject, OnInit, CUSTOM_ELEMENTS_SCHEMA, ViewChild, AfterView
 import { CommonModule } from '@angular/common';
 import { addDoc, collection, doc, Firestore, getDoc, getDocs, query, where, serverTimestamp } from '@angular/fire/firestore';
 
-import {MatInputModule} from '@angular/material/input';
-import {MatFormFieldModule} from '@angular/material/form-field';
-import {MatStepper, MatStepperModule} from '@angular/material/stepper';
-import {MatButtonModule} from '@angular/material/button';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatStepper, MatStepperModule } from '@angular/material/stepper';
+import { MatButtonModule } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
-import {MatRadioModule} from '@angular/material/radio'
+import { MatRadioModule } from '@angular/material/radio';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { map, Observable } from 'rxjs';
@@ -32,6 +33,7 @@ import { startOfDay } from 'date-fns';
     MatDatepickerModule,
     MatNativeDateModule,
     MatRadioModule,
+    MatProgressSpinnerModule,
     NgxStripeModule,
     
   ],
@@ -55,6 +57,7 @@ export class AppointmentComponent implements OnInit, AfterViewInit{
   today = startOfDay(new Date());
   selectedTime: any;
   bookedTimes: any;
+  isLoading: boolean = false;
   
   constructor(
     private firestore: Firestore,
@@ -272,6 +275,7 @@ export class AppointmentComponent implements OnInit, AfterViewInit{
 
   // Step 4
   redirectToStripeCheckout(): void {
+    this.isLoading = true;
     console.log("All fields: " + JSON.stringify(this.serviceSelectionForm.value.selectedService) + " " + this.selectedStaff + " " + this.selectedDate.toISOString().split('T')[0] + " " + this.selectedTime);
 
     if (this.serviceSelectionForm.value.selectedService.name && this.selectedStaff && this.selectedDate && this.selectedTime) {
@@ -279,6 +283,7 @@ export class AppointmentComponent implements OnInit, AfterViewInit{
       const description = this.serviceSelectionForm.value.selectedService.description;
       const productImageUrl = this.serviceSelectionForm.value.selectedService.productImageUrl;
       if (amount === 0) {
+        this.isLoading = false;
         console.error("Invalid service selected.");
         return;
       }
@@ -304,22 +309,27 @@ export class AppointmentComponent implements OnInit, AfterViewInit{
       })
         .then((response) => {
           if(!response.ok){
+            this.isLoading = false;
             throw new Error("Failed to fetch Stripe Checkout URL.");
           }
           return response.json();
         })
         .then((data) => {
           if (data.payment_link){
+            this.isLoading = false;
             console.log("Redirecting to Stripe Checkout URL: " + data.payment_link);
             window.location.href = data.payment_link; // Redirecting to the Stripe Checkout URL
           } else {
+            this.isLoading = false;
             console.error("Stripe Checkout URL not received.");
           }
         })
         .catch((error) => {
+          this.isLoading = false;
           console.error("Error:", error);
         })
     } else {
+      this.isLoading = false;
       console.error("Service, staff, or date/time not selected.");
     }  
   }

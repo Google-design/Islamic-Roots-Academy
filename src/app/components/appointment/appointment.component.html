@@ -109,6 +109,9 @@
       <button mat-button matStepperPrevious>Back</button>
       <button mat-button [disabled]="!selectedDate || !selectedTime || this.bookedTimes.includes(selectedTime)" (click)="redirectToStripeCheckout()">Next</button>
     </div>
+    <div *ngIf="isLoading" class="spinner-overlay">
+      <mat-spinner></mat-spinner>
+    </div>
   </mat-step>
 
   <!-- Step 4: Payment -->

@@ -215,3 +215,16 @@ form, .stepper-container {
   background-color: #96f4ff;
   color: white;
 }
+
+.spinner-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.5); /* Optional: to dim the background */
+  z-index: 1000;
+}
