@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, CUSTOM_ELEMENTS_SCHEMA, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { addDoc, collection, doc, Firestore, getDoc, getDocs, query, where } from '@angular/fire/firestore';
+import { addDoc, collection, doc, Firestore, getDoc, getDocs, query, where, serverTimestamp } from '@angular/fire/firestore';
 
 import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
@@ -14,7 +14,6 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { map, Observable } from 'rxjs';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { NgxStripeModule } from 'ngx-stripe';
-import { loadStripe } from '@stripe/stripe-js';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { startOfDay } from 'date-fns';
@@ -92,15 +91,29 @@ export class AppointmentComponent implements OnInit, AfterViewInit{
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
       const step = params['step'];
-      const selectedServiceName = params['service']; // Retrieve the service from query params
+      const selectedServiceName = params['serviceBooked'];
+      const staffName = params['staffBooked'];
+      const dateBooked = params['dateBooked'];
+      const timeBooked = params['timeBooked'];
       const sessionId = params['checkout_session_id'];
 
       if (selectedServiceName) {
         this.selectedService = selectedServiceName;
       }
+      if (staffName) {
+        this.selectedStaff = staffName;
+      }
+      if (dateBooked) {
+        this.selectedDate = dateBooked;
+      }
+      if (timeBooked) {
+        this.selectedTime = timeBooked;
+      }
+
+      console.log("NG ONINT: " + this.selectedService + this.selectedStaff + this.selectedDate + this.selectedTime);
+
       if (sessionId) {
-        // Assuming that the user was redirected to success_url with the session_id
-        this.createDocument(sessionId);
+        this.verifyPayment(sessionId);
       }
 
       if (step && !isNaN(step)) {
@@ -261,10 +274,8 @@ export class AppointmentComponent implements OnInit, AfterViewInit{
     console.log("All fields: " + JSON.stringify(this.serviceSelectionForm.value.selectedService) + " " + this.selectedStaff + " " + this.selectedDate.toISOString().split('T')[0] + " " + this.selectedTime);
 
     if (this.serviceSelectionForm.value.selectedService.name && this.selectedStaff && this.selectedDate && this.selectedTime) {
-      const amount = this.serviceSelectionForm.value.selectedService.price
-      
-      const description = this.serviceSelectionForm.value.selectedService.description
-
+      const amount = this.serviceSelectionForm.value.selectedService.price;
+      const description = this.serviceSelectionForm.value.selectedService.description;
       const productImageUrl = this.serviceSelectionForm.value.selectedService.productImageUrl;
       if (amount === 0) {
         console.error("Invalid service selected.");
@@ -282,7 +293,8 @@ export class AppointmentComponent implements OnInit, AfterViewInit{
       };
 
       // API Hit
-      fetch("https://q1z2uksjy7.execute-api.us-east-2.amazonaws.com/stripePaymentLinks", {
+      const stripePaymentApiUrl = "https://q1z2uksjy7.execute-api.us-east-2.amazonaws.com/stripePaymentLinks"
+      fetch(stripePaymentApiUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -313,34 +325,62 @@ export class AppointmentComponent implements OnInit, AfterViewInit{
 
   // Step 5
   // Hit the api to check the payment status and then create the docuemnt
-  async createDocument(sessionId: string) {
-    try {
-        const bookingData = {
-          serviceBooked: this.selectedService,
-          staffBooked: this.selectedStaff,
-          timeBooked: this.selectedDate.toISOString(),
-          userName: 'Checking user',  // Ideally, use the logged-in user's data
-          sessionId: sessionId, // Save the sessionId to reference the payment
-        };
+  verifyPayment(sessionId: string): void {
+    const verifyPaymentApiUrl = "https://gwk9rgbthi.execute-api.us-east-2.amazonaws.com/dev/verifyPayment";
 
-        // Save the booking data in Firestore after successful payment
-        const bookingId = await this.saveBookingData(bookingData);
-        console.log('Booking confirmed and saved:', bookingId);
-    } catch (error) {
-      console.error('Error confirming booking after payment:', error);
-    }
+    fetch(verifyPaymentApiUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ sessionId }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Payment verification failed.");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        if(data.session.payment_status === "paid") {
+          console.log("Payment verified successfully:", data);
+          const customerName = data.session.customer_details.name;
+          const customerEmail = data.session.customer_details.email;
+          const customerSessionId = data.session.id;
+          this.createAppointmentDocument(customerName, customerEmail, customerSessionId);
+        } else {
+          console.error("Payment not completed. Status:", data.session?.payment_status);
+          // Payment not complete cases
+        }
+      })
+      .catch((error) => {
+        console.error("Error during payment verification:", error);
+      })
   }
 
-  // Function to save the booking data to Firestore
-  async saveBookingData(bookingData: any): Promise<string> {
-    try {
-      const bookingsCollection = collection(this.firestore, 'bookings');
+
+  async createAppointmentDocument(customerName: string, customerEmail: string, customerSessionId: string) {
+    const bookingDate = new Date(`${this.selectedDate} ${this.selectedTime}`);
+
+    const bookingsCollection = collection(this.firestore, 'bookings');
+    const bookingData = {
+      serviceBooked: this.selectedService,
+      staffBooked: this.selectedStaff,
+      userName: customerName,
+      userEmail: customerEmail,
+      timeBooked: bookingDate,
+      sessionId: customerSessionId,
+      createdAt: serverTimestamp()
+    };
+
+    try{
       const docRef = await addDoc(bookingsCollection, bookingData);
       console.log('Booking data saved:', docRef.id);
-      return docRef.id;  // Return the document ID for tracking
+      return docRef.id;
     } catch (error) {
-      console.error('Error saving booking data:', error);
+      console.error('Error saving booking data: ', error);
       throw error;
     }
   }
+
 }
