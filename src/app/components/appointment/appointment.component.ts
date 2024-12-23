@@ -43,7 +43,7 @@ import { startOfDay } from 'date-fns';
 })
 
 export class AppointmentComponent implements OnInit, AfterViewInit{
-  @ViewChild('stepper') stepper!: MatStepper;
+  @ViewChild('stepper', {static: false }) stepper!: MatStepper;
   isLinear: boolean = true;  // Default value for linear navigation
   services: any[] = [];
   stepperOrientation: Observable<'horizontal' | 'vertical'>;
@@ -56,7 +56,7 @@ export class AppointmentComponent implements OnInit, AfterViewInit{
   availableTimes: { time: string; disabled: boolean }[] = [];
   today = startOfDay(new Date());
   selectedTime: any;
-  bookedTimes: any;
+  bookedTimes: string[] = [];
   isLoading: boolean = false;
   
   constructor(
@@ -80,16 +80,18 @@ export class AppointmentComponent implements OnInit, AfterViewInit{
   }
 
   ngAfterViewInit(): void {
-    // Now the stepper is available, subscribe to selectionChange
-    this.stepper.selectionChange.subscribe((event) => {
-      const selectedIndex = event.selectedIndex;
+    if (this.stepper) {
+      // Now the stepper is available, subscribe to selectionChange
+      this.stepper.selectionChange.subscribe((event) => {
+        const selectedIndex = event.selectedIndex;
 
-      // Ensure the user cannot skip steps if not valid
-      if (selectedIndex > this.stepper.selectedIndex && !this.isStepValid(this.stepper.selectedIndex)) {
-        // Prevent navigating forward if the current step is invalid
-        this.stepper.selectedIndex = this.stepper.selectedIndex;
-      }
-    });
+        // Ensure the user cannot skip steps if not valid
+        if (selectedIndex > this.stepper.selectedIndex && !this.isStepValid(this.stepper.selectedIndex)) {
+          // Prevent navigating forward if the current step is invalid
+          this.stepper.selectedIndex = this.stepper.selectedIndex;
+        }
+      });
+    }
   }
 
   ngOnInit(): void {
