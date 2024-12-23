@@ -101,8 +101,8 @@
       </div>
     </div>
     
-    <div *ngIf="availableTimes?.length === 0">
-      <p>No times available for the selected date.</p>
+    <div *ngIf="availableTimes?.length === 0" class="no-times-container">
+      <p class="no-times-message">No times available for the selected date.</p>
     </div>
     
     <div>
@@ -144,7 +144,6 @@
     <p>Your appointment is successfully scheduled.</p>
     <div>
       <button mat-button matStepperPrevious>Back</button>
-      <button mat-button (click)="stepper.reset()">Reset</button>
     </div>
   </mat-step>
 </mat-stepper>

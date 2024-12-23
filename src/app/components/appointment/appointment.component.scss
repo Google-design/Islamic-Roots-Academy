@@ -228,3 +228,21 @@ form, .stepper-container {
   background-color: rgba(0, 0, 0, 0.5); /* Optional: to dim the background */
   z-index: 1000;
 }
+
+.no-times-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  margin: 10px 0;
+  text-align: center;
+}
+
+.no-times-message {
+  font-size: 16px;
+  color: #555;
+  font-weight: bold;
+}
