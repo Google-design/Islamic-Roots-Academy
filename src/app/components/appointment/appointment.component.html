@@ -94,6 +94,7 @@
         color="primary"
         (click)="!timeSlot.disabled && selectTime(timeSlot.time)"
         [disabled]="timeSlot.disabled"
+        [ngClass]="{'selected-time': timeSlot.time === selectedTime}"
         >
           {{ timeSlot.time }}
         </button>
@@ -106,7 +107,7 @@
     
     <div>
       <button mat-button matStepperPrevious>Back</button>
-      <button mat-button (click)="redirectToStripeCheckout()">Next</button>
+      <button mat-button [disabled]="!selectedDate || !selectedTime || this.bookedTimes.includes(selectedTime)" (click)="redirectToStripeCheckout()">Next</button>
     </div>
   </mat-step>
 

@@ -54,6 +54,7 @@ export class AppointmentComponent implements OnInit, AfterViewInit{
   availableTimes: { time: string; disabled: boolean }[] = [];
   today = startOfDay(new Date());
   selectedTime: any;
+  bookedTimes: any;
   
   constructor(
     private firestore: Firestore,
@@ -236,7 +237,7 @@ export class AppointmentComponent implements OnInit, AfterViewInit{
         where('timeBooked', '<', new Date(selectedDateString + 'T23:59:59'))
       );
       const snapshot = await getDocs(bookingsQuery);
-      const bookedTimes = snapshot.docs.map(doc => {
+      this.bookedTimes = snapshot.docs.map(doc => {
         const bookingData = doc.data();
         return new Date(bookingData['timeBooked'].seconds * 1000).toLocaleTimeString('en-US', {
           hour: '2-digit',
@@ -254,7 +255,7 @@ export class AppointmentComponent implements OnInit, AfterViewInit{
       // Flagging booked times
       this.availableTimes = availableTimesForDay.map((actualTime: string) => ({
         time: actualTime,
-        disabled: bookedTimes.includes(actualTime), // Mark times as disabled if already booked
+        disabled: this.bookedTimes.includes(actualTime), // Mark times as disabled if already booked
       }));
 
       } catch(error) {
