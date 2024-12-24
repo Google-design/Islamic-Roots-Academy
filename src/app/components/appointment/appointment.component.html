@@ -140,12 +140,23 @@
   <!-- Step 5: Done -->
   <mat-step label="Step 5">
     
-    <div *ngIf="!isLoadingBookingDetails">
+    <div *ngIf="!isLoadingBookingDetails" class="confirmation-wrapper">
       <ng-template matStepLabel>Done</ng-template>
-        <div>
-          <h2>Booking Confirmation</h2>
-          <p>Thank you for your booking! Here are the details:</p>
-          <div class="confirmation-details">
+      <div class="confirmation-container">
+        <!-- Logo Section -->
+        <div class="logo-container">
+          <img src="https://islamic-roots-academy.s3.us-east-2.amazonaws.com/Logo.png" alt="Logo" class="logo">
+        </div>
+    
+        <!-- Confirmation Title -->
+        <h2 class="confirmation-title">Booking Confirmation</h2>
+    
+        <!-- Confirmation Subtitle -->
+        <p class="confirmation-subtitle">Thank you for your booking! Here are the details:</p>
+    
+        <!-- Confirmation Details -->
+        <div class="confirmation-details">
+          <div class="details-row">
             <p><strong>Confirmation Number:</strong> {{ confirmationDetails?.docRefId }}</p>
             <p><strong>Name:</strong> {{ confirmationDetails?.userName }}</p>
             <p><strong>Email:</strong> {{ confirmationDetails?.userEmail }}</p>
@@ -154,13 +165,14 @@
             <p><strong>Date:</strong> {{ confirmationDetails?.bookingDate | date: 'mediumDate' }}</p>
             <p><strong>Time:</strong> {{ confirmationDetails?.bookingDate | date: 'shortTime' }}</p>
           </div>
-          <button mat-button matStepperPrevious>Back</button>
         </div>
+    
+        <!-- Go To Home Button -->
+        <div class="button-container">
+          <a mat-button href="https://islamicrootsacademy.com/" class="back-button">Go To Home</a>
+        </div>
+      </div>
     </div>
-    <!-- Spinner for loading state -->
-    <!-- <div *ngIf="isLoadingBookingDetails" class="spinner-overlay">
-      <mat-spinner></mat-spinner>
-      <p>Verifying payment and processing your booking...</p>
-    </div> -->
+    
   </mat-step>
 </mat-stepper>
