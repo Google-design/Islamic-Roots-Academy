@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, CUSTOM_ELEMENTS_SCHEMA, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, inject, OnInit, CUSTOM_ELEMENTS_SCHEMA, ViewChild, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { addDoc, collection, doc, Firestore, getDoc, getDocs, query, where, serverTimestamp } from '@angular/fire/firestore';
 
@@ -58,12 +58,15 @@ export class AppointmentComponent implements OnInit, AfterViewInit{
   selectedTime: any;
   bookedTimes: string[] = [];
   isLoading: boolean = false;
+  isLoadingBookingDetails: boolean = false;
+  confirmationDetails: any | null = null;
   
   constructor(
     private firestore: Firestore,
     private fb: FormBuilder,
     private router: Router,
     private route: ActivatedRoute,
+    private cdr: ChangeDetectorRef
   ) {
     
     // Step 1
@@ -341,6 +344,9 @@ export class AppointmentComponent implements OnInit, AfterViewInit{
   verifyPayment(sessionId: string): void {
     const verifyPaymentApiUrl = "https://gwk9rgbthi.execute-api.us-east-2.amazonaws.com/dev/verifyPayment";
 
+    this.isLoadingBookingDetails = true;
+    this.cdr.detectChanges();
+    
     fetch(verifyPaymentApiUrl, {
       method: "POST",
       headers: {
@@ -363,11 +369,13 @@ export class AppointmentComponent implements OnInit, AfterViewInit{
           this.createAppointmentDocument(customerName, customerEmail, customerSessionId);
         } else {
           console.error("Payment not completed. Status:", data.session?.payment_status);
+          this.isLoadingBookingDetails = false;
           // Payment not complete cases
         }
       })
       .catch((error) => {
         console.error("Error during payment verification:", error);
+        this.isLoadingBookingDetails = false;
       })
   }
 
@@ -389,10 +397,18 @@ export class AppointmentComponent implements OnInit, AfterViewInit{
     try{
       const docRef = await addDoc(bookingsCollection, bookingData);
       console.log('Booking data saved:', docRef.id);
-      return docRef.id;
+
+      // Store details in confirmationDetails
+      this.confirmationDetails = {
+        docRefId: docRef.id,
+        ...bookingData,
+        bookingDate
+      };
     } catch (error) {
       console.error('Error saving booking data: ', error);
       throw error;
+    } finally {
+      this.isLoadingBookingDetails = false;
     }
   }
 

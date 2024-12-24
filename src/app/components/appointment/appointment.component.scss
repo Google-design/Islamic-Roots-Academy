@@ -246,3 +246,25 @@ form, .stepper-container {
   color: #555;
   font-weight: bold;
 }
+
+.confirmation-details {
+  border: 1px solid #ddd;
+  padding: 16px;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+.confirmation-details p {
+  margin: 8px 0;
+}
+.spinner-overlay {
+  position: fixed; /* Or absolute, depending on your layout */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.8); /* Optional: Add a translucent background */
+  z-index: 1000; /* Ensure it appears above other elements */
+}

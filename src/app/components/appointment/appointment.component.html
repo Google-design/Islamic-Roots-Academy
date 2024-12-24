@@ -117,33 +117,50 @@
   <!-- Step 4: Payment -->
   <mat-step label="Step 4">
     <ng-template matStepLabel>Payment</ng-template>
-    <!-- <p>Payment integration coming soon...</p> -->
 
-    <stripe-buy-button
-      *ngIf="selectedService == 'Quran Classes'"
-      buy-button-id="buy_btn_1QXoS9JdgLdisV6J6uPK06Qm"
-      publishable-key="pk_test_51QXV2HJdgLdisV6JlmygXHpsuPQHovT4VsF5YgSrEIEuF5qWTG3aqC7BU6yeKpympI3WRjRsZXpNwVuoCOI2VEUZ00QzkS8kUI"
-    >
-    </stripe-buy-button>
+      <stripe-buy-button
+        *ngIf="selectedService == 'Quran Classes'"
+        buy-button-id="buy_btn_1QXoS9JdgLdisV6J6uPK06Qm"
+        publishable-key="pk_test_51QXV2HJdgLdisV6JlmygXHpsuPQHovT4VsF5YgSrEIEuF5qWTG3aqC7BU6yeKpympI3WRjRsZXpNwVuoCOI2VEUZ00QzkS8kUI"
+      >
+      </stripe-buy-button>
 
-    <stripe-buy-button
-      *ngIf="selectedService == 'Aqeedah Classes'"
-      buy-button-id="buy_btn_1QYYvlJdgLdisV6Jls5sot9n"
-      publishable-key="pk_test_51QXV2HJdgLdisV6JlmygXHpsuPQHovT4VsF5YgSrEIEuF5qWTG3aqC7BU6yeKpympI3WRjRsZXpNwVuoCOI2VEUZ00QzkS8kUI"
-    ></stripe-buy-button>
+      <stripe-buy-button
+        *ngIf="selectedService == 'Aqeedah Classes'"
+        buy-button-id="buy_btn_1QYYvlJdgLdisV6Jls5sot9n"
+        publishable-key="pk_test_51QXV2HJdgLdisV6JlmygXHpsuPQHovT4VsF5YgSrEIEuF5qWTG3aqC7BU6yeKpympI3WRjRsZXpNwVuoCOI2VEUZ00QzkS8kUI"
+      ></stripe-buy-button>
 
-    <div>
-      <button mat-button matStepperPrevious>Back</button>
-      <button mat-button matStepperNext>Next</button>
-    </div>
+      <div>
+        <button mat-button matStepperPrevious>Back</button>
+        <button mat-button matStepperNext>Next</button>
+      </div>
   </mat-step>
 
   <!-- Step 5: Done -->
   <mat-step label="Step 5">
-    <ng-template matStepLabel>Done</ng-template>
-    <p>Your appointment is successfully scheduled.</p>
-    <div>
-      <button mat-button matStepperPrevious>Back</button>
+    
+    <div *ngIf="!isLoadingBookingDetails">
+      <ng-template matStepLabel>Done</ng-template>
+        <div>
+          <h2>Booking Confirmation</h2>
+          <p>Thank you for your booking! Here are the details:</p>
+          <div class="confirmation-details">
+            <p><strong>Confirmation Number:</strong> {{ confirmationDetails?.docRefId }}</p>
+            <p><strong>Name:</strong> {{ confirmationDetails?.userName }}</p>
+            <p><strong>Email:</strong> {{ confirmationDetails?.userEmail }}</p>
+            <p><strong>Service:</strong> {{ confirmationDetails?.serviceBooked }}</p>
+            <p><strong>Staff:</strong> {{ confirmationDetails?.staffBooked }}</p>
+            <p><strong>Date:</strong> {{ confirmationDetails?.bookingDate | date: 'mediumDate' }}</p>
+            <p><strong>Time:</strong> {{ confirmationDetails?.bookingDate | date: 'shortTime' }}</p>
+          </div>
+          <button mat-button matStepperPrevious>Back</button>
+        </div>
     </div>
+    <!-- Spinner for loading state -->
+    <!-- <div *ngIf="isLoadingBookingDetails" class="spinner-overlay">
+      <mat-spinner></mat-spinner>
+      <p>Verifying payment and processing your booking...</p>
+    </div> -->
   </mat-step>
 </mat-stepper>
