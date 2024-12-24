@@ -10,6 +10,8 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatIconModule } from '@angular/material/icon';
+
 
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { map, Observable } from 'rxjs';
@@ -34,6 +36,7 @@ import { startOfDay } from 'date-fns';
     MatNativeDateModule,
     MatRadioModule,
     MatProgressSpinnerModule,
+    MatIconModule,
     NgxStripeModule,
     
   ],

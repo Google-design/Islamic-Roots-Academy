@@ -1,8 +1,11 @@
 <h1>Islamic Roots Academy</h1>
 
 <mat-stepper [linear]="isLinear" [orientation]="(stepperOrientation | async) || 'horizontal'" #stepper>
+  <ng-template matStepperIcon="edit">
+    <mat-icon aria-hidden="false" aria-label="my clock"></mat-icon>
+  </ng-template>
   <!-- Step 1: Select a Service -->
-  <mat-step label="Step 1">
+  <mat-step label="Step 1" >
     <ng-template matStepLabel>Select a service</ng-template>
 
     <form [formGroup]="serviceSelectionForm">
