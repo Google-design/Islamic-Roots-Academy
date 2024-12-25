@@ -393,7 +393,7 @@ export class AppointmentComponent implements OnInit, AfterViewInit{
       userName: customerName,
       userEmail: customerEmail,
       timeBooked: bookingDate,
-      sessionId: customerSessionId,
+      sessionId: customerSessionId.slice(-9),
       createdAt: serverTimestamp()
     };
 
