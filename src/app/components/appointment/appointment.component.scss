@@ -311,9 +311,9 @@ form, .stepper-container {
   justify-content: center;
   background-color: #f9fafb;
   border-radius: 8px;
-  padding: 20px;
+  // padding: 20px;
   box-sizing: border-box;
-  margin-bottom: 30px;
+  // margin-bottom: 30px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 }
 
@@ -337,6 +337,7 @@ form, .stepper-container {
   .confirmation-container {
     padding: 20px;
     height: 79vh;
+    width: 50vw;
   }
 
   .confirmation-title {
@@ -348,7 +349,7 @@ form, .stepper-container {
   }
 
   .confirmation-details p {
-    font-size: 1em;
+    font-size: 0.8em;
   }
 
   .back-button {
