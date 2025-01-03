@@ -49,19 +49,19 @@
       <div 
         class="staff-card" 
         *ngFor="let staff of selectedServiceStaff" 
-        [class.selected]="selectedStaff === staff"
+        [class.selected]="selectedStaff?.name === staff.name"
         (click)="onStaffSelect(staff)"
       >
         <div class="staff-avatar">
           <span>{{ getStaffInitials(staff) }}</span> <!-- Pass 'staff' directly -->
         </div>
         <div class="staff-info">
-          <h3>{{ staff }}</h3> <!-- Display the staff member's name -->
-          <p>{{ 'Staff' }}</p> <!-- Display a static role, or adjust as needed -->
+          <h3>{{ staff.name }}</h3> <!-- Display the staff member's name -->
+          <p>{{ staff.gender }}</p> <!-- Display a static role, or adjust as needed -->
         </div>
         <mat-radio-button 
           [value]="staff" 
-          [checked]="selectedStaff === staff"
+          [checked]="selectedStaff === staff.name"
           class="staff-radio"
         >
         </mat-radio-button>

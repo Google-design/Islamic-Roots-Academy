@@ -170,11 +170,11 @@ export class AppointmentComponent implements OnInit, AfterViewInit{
       console.log('Staff for selected service:', this.selectedServiceStaff);  // Should log an array of strings
 
       // Step 3: Redirect logic based on selected service
-      if (service.name === 'Quran Classes') {
-        this.selectedServiceUrl = 'https://book.stripe.com/test_28o17M9tK6gggwg000'; // URL for Service 1
-      } else if (service.name === 'Aqeedah Classes') {
-        this.selectedServiceUrl = 'https://book.stripe.com/test_9AQeYC7lCgUUfsceUV'; // URL for Service 2
-      }
+      // if (service.name === 'Quran Classes') {
+      //   this.selectedServiceUrl = 'https://book.stripe.com/test_28o17M9tK6gggwg000'; // URL for Service 1
+      // } else if (service.name === 'Aqeedah Classes') {
+      //   this.selectedServiceUrl = 'https://book.stripe.com/test_9AQeYC7lCgUUfsceUV'; // URL for Service 2
+      // }
 
     } else {
       console.error('Service document not found!');
@@ -184,17 +184,17 @@ export class AppointmentComponent implements OnInit, AfterViewInit{
 
   // Function to handle staff selection
   onStaffSelect(staff: any) {
-    this.selectedStaff = staff;
+    this.selectedStaff = staff.name;
     console.log('Selected Staff:', staff);
   }
 
   // Function to retrieve initials of staff name
-  getStaffInitials(name: string): string {
-    if (!name) {
+  getStaffInitials(staff: { name: string }): string {
+    if (!staff || !staff.name) {
       return ''; // Return an empty string if name is undefined or null
     }
   
-    return name
+    return staff.name
       .split(' ') // Split the string into words
       .map(word => word[0]) // Take the first letter of each word
       .filter(char => char) // Filter out any undefined or empty values
