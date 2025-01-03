@@ -77,6 +77,7 @@ h1 {
 .service-card.selected {
   border-color: #3f51b5;
   box-shadow: 0 2px 8px rgba(63, 81, 181, 0.3);
+  background-color: e6f0ff;
 }
 
 .service-radio {
@@ -107,9 +108,13 @@ h1 {
   transition: background-color 0.3s ease;
 }
 
+.staff-card:hover{
+  background-color: #dde5ff;
+}
+
 .staff-card.selected {
   background-color: #e6f0ff; /* Light blue for selected */
-  border-color: #004a99;
+  border-color: #3f51b5;
 }
 
 .staff-avatar {
@@ -363,4 +368,83 @@ form, .stepper-container {
 }
 ::ng-deep .mat-vertical-stepper-header{
   pointer-events: none !important;
+}
+
+/* Container for the filter */
+.gender-filter {
+  display: flex;
+  justify-content: center; /* Center the filter horizontally */
+  align-items: center;
+  margin-bottom: 1rem; /* Reduce vertical space */
+}
+
+/* Button toggle group */
+.gender-toggle-group {
+  display: flex;
+  gap: 0.5rem; /* Reduce spacing between toggles */
+  border: 1px solid #d0d7de; /* Subtle border for contrast */
+  border-radius: 6px; /* Slight rounding for modern appearance */
+  padding: 0.3rem 0.5rem; /* Compact padding for smaller height */
+  background-color: #f4f8fc; /* Light blue background */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  max-width: 300px; /* Set a max width to prevent oversized group */
+}
+
+/* Individual toggles */
+.gender-toggle {
+  font-size: 0.875rem; /* Adjust font size for compactness */
+  padding: 0.4rem 0.8rem; /* Reduce padding for smaller buttons */
+  border-radius: 4px; /* Rounded corners */
+  color: #061671; /* Blue text for your theme */
+  font-weight: 500; /* Medium weight text for readability */
+  transition: background-color 0.2s ease, color 0.2s ease; /* Smooth transitions */
+}
+
+/* Hover effect for toggles */
+.gender-toggle:hover {
+  background-color: #e3f2fd; /* Light blue hover background */
+  color: #1e71e5; /* Darker blue on hover */
+  cursor: pointer;
+}
+
+/* Selected toggle styling */
+.mat-button-toggle-checked {
+  background-color: #1e88e5 !important; /* Primary blue for active toggle */
+  color: white !important; /* White text for active toggle */
+  font-weight: bold !important; /* Bold text for emphasis */
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2); /* Subtle shadow for active toggle */
+}
+
+/* Non-selected toggles */
+.mat-button-toggle:not(.mat-button-toggle-checked) {
+  border: 1px solid transparent; /* No border for unselected toggles */
+}
+
+.mat-button-toggle:not(.mat-button-toggle-checked):hover {
+  border: 1px solid #1e88e5; /* Add blue border on hover */
+}
+
+/* Media queries for responsiveness */
+@media (max-width: 768px) {
+  .gender-toggle-group {
+    flex-direction: column; /* Stack buttons vertically on smaller screens */
+    gap: 0.3rem; /* Reduce spacing */
+  }
+
+  .gender-toggle {
+    padding: 0.3rem 0.8rem; /* Smaller padding for tighter layout */
+    font-size: 0.8rem; /* Adjust font size for smaller screens */
+  }
+}
+
+@media (max-width: 480px) {
+  .gender-filter {
+    margin-bottom: 0.5rem;
+    padding: 0.3rem;
+  }
+
+  .gender-toggle {
+    padding: 0.2rem 0.6rem; /* Even smaller padding */
+    font-size: 0.75rem; /* Compact font size */
+  }
 }

@@ -44,12 +44,25 @@
   <!-- Step 2: Select a Staff -->
   <mat-step label="Step 2">
     <ng-template matStepLabel>Select a Staff Member</ng-template>
-  
+
+    <!-- Filtering Gender  -->
+    <div class="gender-filter">
+      <mat-button-toggle-group
+        [(ngModel)]="selectedGender"
+        (change)="onGenderFilterChange($event)"
+        class="gender-toggle-group"
+      >
+        <mat-button-toggle value="" class="gender-toggle">All</mat-button-toggle>
+        <mat-button-toggle value="Male" class="gender-toggle">Male</mat-button-toggle>
+        <mat-button-toggle value="Female" class="gender-toggle">Female</mat-button-toggle>
+      </mat-button-toggle-group>
+    </div>   
+    
     <div class="staff-container">
       <div 
         class="staff-card" 
-        *ngFor="let staff of selectedServiceStaff" 
-        [class.selected]="selectedStaff?.name === staff.name"
+        *ngFor="let staff of filteredStaff" 
+        [class.selected]="selectedStaff === staff.name"
         (click)="onStaffSelect(staff)"
       >
         <div class="staff-avatar">
@@ -60,7 +73,7 @@
           <p>{{ staff.gender }}</p> <!-- Display a static role, or adjust as needed -->
         </div>
         <mat-radio-button 
-          [value]="staff" 
+          [value]="staff.name" 
           [checked]="selectedStaff === staff.name"
           class="staff-radio"
         >

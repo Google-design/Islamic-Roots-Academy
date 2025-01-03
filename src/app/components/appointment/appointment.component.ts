@@ -11,6 +11,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 
 
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -37,6 +38,7 @@ import { startOfDay } from 'date-fns';
     MatRadioModule,
     MatProgressSpinnerModule,
     MatIconModule,
+    MatButtonToggleModule,
     NgxStripeModule,
     
   ],
@@ -63,6 +65,8 @@ export class AppointmentComponent implements OnInit, AfterViewInit{
   isLoading: boolean = false;
   isLoadingBookingDetails: boolean = false;
   confirmationDetails: any | null = null;
+  selectedGender: string = '';            // Empty string means no filter
+  filteredStaff: any[] = [];
   
   constructor(
     private firestore: Firestore,
@@ -167,14 +171,8 @@ export class AppointmentComponent implements OnInit, AfterViewInit{
     if (serviceDocSnap.exists()) {
       const serviceData = serviceDocSnap.data();
       this.selectedServiceStaff = serviceData['teamMembers'] || [];
+      this.filteredStaff = this.selectedServiceStaff;
       console.log('Staff for selected service:', this.selectedServiceStaff);  // Should log an array of strings
-
-      // Step 3: Redirect logic based on selected service
-      // if (service.name === 'Quran Classes') {
-      //   this.selectedServiceUrl = 'https://book.stripe.com/test_28o17M9tK6gggwg000'; // URL for Service 1
-      // } else if (service.name === 'Aqeedah Classes') {
-      //   this.selectedServiceUrl = 'https://book.stripe.com/test_9AQeYC7lCgUUfsceUV'; // URL for Service 2
-      // }
 
     } else {
       console.error('Service document not found!');
@@ -209,6 +207,17 @@ export class AppointmentComponent implements OnInit, AfterViewInit{
     }
     this.onDateChange(this.selectedDate);
   }
+
+  onGenderFilterChange(event: any): void {
+    // Reapply the filter whenever the gender selection changes
+    if (!this.selectedGender) {
+      // No filter; display all staff
+      this.filteredStaff = this.selectedServiceStaff;
+    } else {
+      // Filter staff based on the selected gender
+      this.filteredStaff = this.selectedServiceStaff.filter(staff => staff.gender === this.selectedGender);
+    }
+  }  
 
   // Step 3
   dateFilter = (date: Date | null): boolean => {
