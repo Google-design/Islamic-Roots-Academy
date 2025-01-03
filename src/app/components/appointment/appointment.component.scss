@@ -427,7 +427,7 @@ form, .stepper-container {
 /* Media queries for responsiveness */
 @media (max-width: 768px) {
   .gender-toggle-group {
-    flex-direction: column; /* Stack buttons vertically on smaller screens */
+    flex-direction: row; /* Stack buttons vertically on smaller screens */
     gap: 0.3rem; /* Reduce spacing */
   }
 
@@ -446,5 +446,12 @@ form, .stepper-container {
   .gender-toggle {
     padding: 0.2rem 0.6rem; /* Even smaller padding */
     font-size: 0.75rem; /* Compact font size */
+  }
+}
+
+@media (max-width: 373px) {
+  .gender-toggle-group {
+    flex-direction: column; /* Stack buttons vertically on smaller screens */
+    gap: 0.3rem; /* Reduce spacing */
   }
 }
