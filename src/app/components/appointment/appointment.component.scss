@@ -455,3 +455,45 @@ form, .stepper-container {
     gap: 0.3rem; /* Reduce spacing */
   }
 }
+
+/* Container for the filter */
+.gender-filter {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+}
+
+/* Material Select Field */
+.gender-select-field {
+  width: 100%;
+  max-width: 300px; /* Limit the width for compact appearance */
+  margin: 0 auto; /* Center the select dropdown */
+}
+
+.mat-form-field {
+  font-size: 0.9rem; /* Adjust font size */
+  color: #5c6bc0; /* Blue color for your theme */
+}
+
+.mat-form-field-appearance-outline .mat-form-field-outline {
+  border-color: #1e88e5; /* Blue outline for your theme */
+}
+
+.mat-select-arrow {
+  color: #1e88e5; /* Blue arrow for dropdown */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .gender-select-field {
+    max-width: 200px; /* Reduce width on tablets */
+  }
+}
+
+@media (max-width: 480px) {
+  .gender-select-field {
+    max-width: 150px; /* Compact width on mobile */
+  }
+}

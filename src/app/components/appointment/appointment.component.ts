@@ -12,7 +12,7 @@ import { MatRadioModule } from '@angular/material/radio';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
-
+import { MatSelectModule } from '@angular/material/select'; // Material select dropdown
 
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { map, Observable } from 'rxjs';
@@ -39,6 +39,7 @@ import { startOfDay } from 'date-fns';
     MatProgressSpinnerModule,
     MatIconModule,
     MatButtonToggleModule,
+    MatSelectModule,
     NgxStripeModule,
     
   ],

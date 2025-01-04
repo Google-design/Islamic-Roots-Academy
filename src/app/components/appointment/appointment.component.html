@@ -46,7 +46,7 @@
     <ng-template matStepLabel>Select a Staff Member</ng-template>
 
     <!-- Filtering Gender  -->
-    <div class="gender-filter">
+    <!-- <div class="gender-filter">
       <mat-button-toggle-group
         [(ngModel)]="selectedGender"
         (change)="onGenderFilterChange($event)"
@@ -56,7 +56,19 @@
         <mat-button-toggle value="Male" class="gender-toggle">Male</mat-button-toggle>
         <mat-button-toggle value="Female" class="gender-toggle">Female</mat-button-toggle>
       </mat-button-toggle-group>
-    </div>   
+    </div>    -->
+
+    <div class="gender-filter">
+      <mat-form-field appearance="outline" class="gender-select-field">
+        <mat-label>Filter by Gender</mat-label>
+        <mat-select [(ngModel)]="selectedGender" (selectionChange)="onGenderFilterChange($event)">
+          <mat-option value="">All</mat-option>
+          <mat-option value="Male">Male</mat-option>
+          <mat-option value="Female">Female</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+    
     
     <div class="staff-container">
       <div 
